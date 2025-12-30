@@ -22,17 +22,6 @@ A web app that allows users to **select a musical scale and swarams (notes)** an
 
 ---
 
-## My Contribution
-
-- Designed the **project structure and interaction flow**.  
-- Implemented the **front end visualization**, including the interactive piano and styled output.  
-- Integrated the **backend transposition logic** with the front end using Flask routes.  
-- Used established musical formulas to ensure **accurate chord transposition**.  
-
-> Note: The front-end structure and integration were assembled using musical theory formulas to render and visualize the transposed notes correctly.
-
----
-
 ## Tech Stack
 
 - Python (Flask)  
