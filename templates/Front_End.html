@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Harmonium Swarams Transposition Tool</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+  <h1>Harmonium & Swarams</h1>
+  <p>Select the scale, then click swarams on the keyboard.</p>
+
+  <div class="controls">
+    <label for="scale">Current Scale:</label>
+    <select id="scale">
+      <option value="C">C</option>
+      <option value="C#">C#</option>
+      <option value="D">D</option>
+      <option value="D#">D#</option>
+      <option value="E">E</option>
+      <option value="F">F</option>
+      <option value="F#">F#</option>
+      <option value="G">G</option>
+      <option value="G#">G#</option>
+      <option value="A">A</option>
+      <option value="A#">A#</option>
+      <option value="B">B</option>
+    </select>
+  </div>
+
+  <div class="piano" id="piano">
+    <!-- White keys -->
+    <div class="key white" data-note="C">S</div>
+    <div class="key white" data-note="D">R2</div>
+    <div class="key white" data-note="E">G2</div>
+    <div class="key white" data-note="F">M1</div>
+    <div class="key white" data-note="G">P</div>
+    <div class="key white" data-note="A">D2</div>
+    <div class="key white" data-note="B">N2</div>
+
+    <!-- Black keys -->
+    <div class="key black" data-note="C#" style="left:45px">R1</div>
+    <div class="key black" data-note="D#" style="left:105px">G1</div>
+    <div class="key black" data-note="F#" style="left:225px">M2</div>
+    <div class="key black" data-note="G#" style="left:285px">D1</div>
+    <div class="key black" data-note="A#" style="left:345px">N1</div>
+  </div>
+
+  <h3>Selected Swarams</h3>
+  <div class="output" id="output"></div>
+  <button id="process-btn">Get Scale Output</button>
+
+</div>
+
+<script>
+  const pianoOrder = ['S','R1','R2','G1','G2','M1','M2','P','D1','D2','N1','N2'];
+  const selectedNotes = new Set();
+  const pianoKeys = Array.from(document.querySelectorAll('.key'));
+  const output = document.getElementById('output');
+
+
+  pianoKeys.forEach(key => {
+  key.addEventListener('click', () => {
+  const note = key.textContent.trim(); // use visible text
+
+
+  if (selectedNotes.has(note)) {
+  selectedNotes.delete(note);
+  key.classList.remove('active');
+  } else {
+  selectedNotes.add(note);
+  key.classList.add('active');
+  }
+
+
+  // display in custom order
+  const orderedNotes = pianoOrder.filter(n => selectedNotes.has(n));
+  output.textContent = orderedNotes.join(', ');
+  });
+  });
+
+  async function sendToPython() {
+      const scale = document.getElementById('scale').value;
+      const swarams = Array.from(selectedNotes);
+
+      if (swarams.length === 0) {
+          alert("Please select some swarams first!");
+          return;
+      }
+
+      const response = await fetch('/process', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({scale, swarams})
+      });
+
+      const data = await response.json();
+      document.getElementById('output').textContent = data.result;
+  }
+
+  document.getElementById('process-btn').addEventListener('click', sendToPython);
+</script>
+
+
+</body>
+</html>
